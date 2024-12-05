@@ -18,13 +18,15 @@ def parse_input(input_data: list[str]) -> tuple[list[str], list[str]]:
     return parsed_rules, [[int(x) for x in update.split(",")] for update in updates]
 
 
-def validate_update(rules: list[tuple[int, int]], update: list[int]):
-    idx = {}
+def validate_update(
+    rules: list[tuple[int, int]], update: list[int]
+) -> tuple[bool, int]:
+    index = {}
     for i, num in enumerate(update):
-        idx[num] = i
+        index[num] = i
 
     for a, b in rules:
-        if a in idx and b in idx and not (idx[a] < idx[b]):
+        if a in index and b in index and not (index[a] < index[b]):
             return False, 0
 
     return True, update[len(update) // 2]
