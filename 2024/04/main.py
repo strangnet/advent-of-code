@@ -49,11 +49,11 @@ def found_str(
     coordinate: tuple[int, int],
     last_move: tuple[int, int] | None = None,
     all_moves: list[str] = ALL_MOVES,
-) -> bool:
+) -> int:
     found = 0
     if str[0] == map[coordinate[1]][coordinate[0]]:
         if len(str) == 1:
-            return True
+            return 1
 
         moves = []
         vm = valid_moves(map, coordinate, all_moves)
