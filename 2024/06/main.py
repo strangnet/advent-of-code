@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 MOVE_N = (-1, 0)
 MOVE_S = (1, 0)
 MOVE_E = (0, 1)
@@ -5,6 +8,7 @@ MOVE_W = (0, -1)
 
 current_direction = MOVE_N
 current_position = (0, 0)
+guard_positions = set()
 
 
 def read_input(file_path: str) -> str:
@@ -73,11 +77,14 @@ def walk_map(
 ) -> list[list[str]]:
     global current_position
     global current_direction
+    global guard_positions
 
     patrol_map[current_position[0]][current_position[1]] = "X"
+    guard_positions.add(current_position)
     next_position = calculate_next_position(current_position, current_direction)
     while not is_outside(patrol_map, next_position):
         patrol_map[current_position[0]][current_position[1]] = "X"
+        guard_positions.add(current_position)
         if is_obstacle(patrol_map, next_position):
             current_direction = next_direction(current_direction)
             next_position = calculate_next_position(current_position, current_direction)
@@ -85,11 +92,54 @@ def walk_map(
         next_position = calculate_next_position(current_position, current_direction)
 
     patrol_map[current_position[0]][current_position[1]] = "X"
+    guard_positions.add(current_position)
     return patrol_map
 
 
-def print_map(final_map: list[list[str]]) -> None:
-    for row in final_map:
+def is_loopable(patrol_map: list[list[str]], position: tuple[int, int]) -> bool:
+    global current_position
+
+    if is_obstacle(patrol_map, position):
+        return False
+    current_position = start_position(patrol_map)
+
+    patrol_map[position[0]][position[1]] = "#"
+
+    direction = MOVE_N
+    visited = set()
+    while True:
+        if (current_position, direction) in visited:
+            patrol_map[position[0]][position[1]] = "."
+            return True
+        visited.add((current_position, direction))
+        next_position = calculate_next_position(current_position, direction)
+        if is_outside(patrol_map, next_position):
+            patrol_map[position[0]][position[1]] = "."
+            return False
+
+        if is_obstacle(patrol_map, next_position):
+            direction = next_direction(direction)
+            next_position = calculate_next_position(current_position, direction)
+        else:
+            current_position = next_position
+
+
+def find_obstacle_locations(original_map: list[list[str]]) -> list[tuple[int, int]]:
+    global guard_positions
+
+    obstacles = []
+
+    for position in guard_positions:
+        patrol_map = deepcopy(original_map)
+        looped = is_loopable(patrol_map, position)
+        if looped:
+            obstacles.append(position)
+
+    return obstacles
+
+
+def print_map(a_map: list[list[str]]) -> None:
+    for row in a_map:
         print("".join(row))
 
 
@@ -103,6 +153,10 @@ def main():
 
     pos = calculate_visited_position(final_map)
     print(pos)
+
+    patrol_map = parse_input(input_data)
+    locs = find_obstacle_locations(patrol_map)
+    print(len(locs))
 
 
 if __name__ == "__main__":
