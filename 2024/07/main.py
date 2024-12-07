@@ -15,13 +15,18 @@ def op_iter(sum, test_value, numbers, op):
         calc = sum + next
     elif op == "*":
         calc = sum * next
+    elif op == "||":
+        calc = int(str(sum) + str(next))
 
     op1 = op_iter(calc, test_value, numbers.copy(), "+")
     op2 = op_iter(calc, test_value, numbers.copy(), "*")
+    op3 = op_iter(calc, test_value, numbers.copy(), "||")
     if op1 == test_value:
         return op1
     elif op2 == test_value:
         return op2
+    elif op3 == test_value:
+        return op3
     else:
         return 0
 
@@ -31,11 +36,15 @@ def operation(test_value, numbers):
 
     sum = op_iter(res, test_value, numbers.copy(), "+")
     prod = op_iter(res, test_value, numbers.copy(), "*")
+    conc = op_iter(res, test_value, numbers.copy(), "||")
     if sum == test_value:
         return sum
 
     if prod == test_value:
         return prod
+
+    if conc == test_value:
+        return conc
 
     return 0
 
