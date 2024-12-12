@@ -1,3 +1,6 @@
+from colorama import Fore, Style
+
+
 def read_input(file_path) -> list[list[int]]:
     with open(file_path, "r") as file:
         return [list(line.strip()) for line in file.readlines()]
@@ -103,32 +106,38 @@ def print_connected(input_data: list[list[str]], connected: list[tuple[int, int]
     for y in range(len(input_data)):
         for x in range(len(input_data[0])):
             if (x, y) in connected:
-                print("-", end="")
+                print(Fore.RED + "o", end="")
             else:
-                print(input_data[y][x], end="")
-        print()
+                print(Style.RESET_ALL + input_data[y][x], end="")
+        print(Style.RESET_ALL)
 
 
 def calc_fencing(connected: list[tuple[int, int]]) -> int:
     return sum(fencing[y][x] for x, y in connected)
 
 
+def calc_fencing2(connected: list[tuple[int, int]]) -> int:
+    for x, y in connected:
+        print(f"({x}, {y}) ({fencing[y][x]})")
+    return 0
+
+
 def main():
-    input_data = read_input("input.txt")
+    input_data = read_input("test_input3.txt")
     # print_map(input_data)
     find_fencing(input_data)
     # print(" ")
 
     sum = 0
-    for x in range(len(input_data[0])):
-        for y in range(len(input_data)):
+    for y in range(len(input_data)):
+        for x in range(len(input_data[0])):
             if (x, y) not in found:
                 c = find_connected_plots(input_data, x, y)
-                # print_connected(input_data, c)
-                # print(f"Found {len(c)} connected plots")
-                # print(f"with fencing {calc_fencing(c)}")
-                sum += len(c) * calc_fencing(c)
-                # print(" ")
+                print_connected(input_data, c)
+
+                print(f"Found {len(c)} connected plots")
+                sum += len(c) * calc_fencing2(c)
+                print(" ")
 
     print(f"Total fencing: {sum}")
 
